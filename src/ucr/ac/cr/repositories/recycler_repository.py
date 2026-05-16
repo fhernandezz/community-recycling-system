@@ -28,10 +28,6 @@ class RecyclerRepository(BaseRepository[Recycler]):
         self.save_all(self._storage)
 
     def update(self, recycler: Recycler) -> None:
-        """
-        Replaces the existing recycler with the same recycler_id in memory
-        and persists the change to disk.
-        """
         for i, r in enumerate(self._storage):
             if r.recycler_id == recycler.recycler_id:
                 self._storage[i] = recycler
