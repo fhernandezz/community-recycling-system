@@ -1,7 +1,7 @@
 import json
 from src.ucr.ac.cr.models.recycling_record import RecyclingRecord
 
-class RecyclingRecordRepository:
+class RecordRepository:
 
     def __init__(self, file_path="data/records.json"):
         self.file_path = file_path
@@ -10,7 +10,9 @@ class RecyclingRecordRepository:
         try:
             with open(self.file_path, "r", encoding="utf-8") as file:
                 data = json.load(file)
+
             return [RecyclingRecord.from_dict(item) for item in data]
+
         except (FileNotFoundError, json.JSONDecodeError):
             return []
 
@@ -22,7 +24,9 @@ class RecyclingRecordRepository:
 
     def add(self, record: RecyclingRecord):
         records = self.get_all()
+
         records.append(record)
+
         self.save_all(records)
 
     def save_all(self, records):

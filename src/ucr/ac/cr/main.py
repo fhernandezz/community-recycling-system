@@ -1,6 +1,6 @@
 from src.ucr.ac.cr.repositories.recycler_repository import RecyclerRepository
 from src.ucr.ac.cr.repositories.collection_point_repository import CollectionPointRepository
-from src.ucr.ac.cr.repositories.recycling_record_repository import RecyclingRecordRepository
+from src.ucr.ac.cr.repositories.record_repository import RecordRepository
 
 from services.recycler_service import RecyclerService
 from services.collection_point_service import CollectionPointService
@@ -8,7 +8,7 @@ from services.record_service import RecordService
 
 from src.ucr.ac.cr.controllers.recycler_controller import RecyclerController
 from src.ucr.ac.cr.controllers.collection_point_controller import CollectionPointController
-from src.ucr.ac.cr.controllers.recycling_record_controller import RecyclingRecordController
+from src.ucr.ac.cr.controllers.record_controller import RecordController
 
 
 # from src.ucr.ac.cr.views.main_view import MainView  cuando brayan haga la vista

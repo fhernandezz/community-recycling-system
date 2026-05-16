@@ -1,4 +1,4 @@
-class RecyclingRecordController:
+class RecordController:
 
     def __init__(self, service):
         self.service = service
@@ -23,5 +23,8 @@ class RecyclingRecordController:
     def get_materials_breakdown(self) -> dict:
         return self.service.get_materials_breakdown()
 
-    def get_records_by_date_range(self, start_date_str: str, end_date_str: str) -> dict:
-        return self.service.get_records_by_date_range(start_date_str, end_date_str)
+    def get_records_by_date_range(self, start_date_str: str, end_date_str: str):
+        return self.service.get_records_by_date_range(
+            start_date_str,
+            end_date_str
+        )
