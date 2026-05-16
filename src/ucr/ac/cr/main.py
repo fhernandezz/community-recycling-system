@@ -17,7 +17,7 @@ from src.ucr.ac.cr.controllers.record_controller import RecordController
 def main():
     recycler_repo = RecyclerRepository("data/recyclers.json")
     point_repo = CollectionPointRepository("data/collection_points.json")
-    record_repo = RecyclingRecordRepository("data/records.json")
+    record_repo = RecordRepository("data/records.json")
 
     recycler_service = RecyclerService(recycler_repo)
     point_service = CollectionPointService(point_repo)
@@ -26,7 +26,7 @@ def main():
 
     recycler_controller = RecyclerController(recycler_service)
     point_controller = CollectionPointController(point_service)
-    record_controller = RecyclingRecordController(record_service)
+    record_controller = RecordController(record_service)
 
     # esto le toca a brayan
     # app = MainView(recycler_controller, point_controller, record_controller)
