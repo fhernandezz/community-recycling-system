@@ -10,22 +10,12 @@ from src.ucr.ac.cr.controllers.recycler_controller import RecyclerController
 from src.ucr.ac.cr.controllers.collection_point_controller import CollectionPointController
 from src.ucr.ac.cr.controllers.record_controller import RecordController
 
-# from src.ucr.ac.cr.views.main_view import MainView  # le toca a Brayan
-
 
 def main():
-    """
-    Entry point. Instantiates all layers bottom-up (DIP).
-    No layer creates its own dependencies — everything is injected here.
-    """
-
-    # Layer 1 — Repositories (each loads its JSON once on __init__)
     recycler_repo = RecyclerRepository("data/recyclers.json")
     point_repo = CollectionPointRepository("data/collection_points.json")
     record_repo = RecordRepository("data/records.json")
 
-    # Layer 2 — Services
-    # RecordService receives the other two SERVICES, not their repos (DIP + ISP)
     recycler_service = RecyclerService(recycler_repo)
     point_service = CollectionPointService(point_repo)
     record_service = RecordService(record_repo, recycler_service, point_service)
