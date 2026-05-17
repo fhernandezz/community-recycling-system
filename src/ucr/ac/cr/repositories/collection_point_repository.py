@@ -3,7 +3,6 @@ from src.ucr.ac.cr.models.collection_point import CollectionPoint
 from src.ucr.ac.cr.repositories.base_repository import BaseRepository
 
 class CollectionPointRepository(BaseRepository[CollectionPoint]):
-
     def __init__(self, file_path="data/collection_points.json"):
         self.file_path = file_path
         self._storage: list = self._load()
