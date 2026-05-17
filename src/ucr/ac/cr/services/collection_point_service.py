@@ -1,219 +1,156 @@
-from datetime import datetime
-from src.ucr.ac.cr.models.recycling_record import RecyclingRecord
-
-VALID_MATERIALS = {"plástico", "vidrio", "papel", "metal", "orgánico"}
+from src.ucr.ac.cr.models.collection_point import CollectionPoint
 
 
-class RecordService:
+class CollectionPointService:
     """
-    Servicio encargado de la gestión de registros de reciclaje.
+    Servicio encargado de la gestión de puntos de recolección.
 
-    Maneja validaciones, creación de registros y generación de reportes
-    relacionados con recicladores, puntos de recolección y materiales.
+    Responsabilidades:
+    - Registro de puntos
+    - Validaciones de negocio
+    - Consulta de puntos
+    - Gestión de estado (activo/inactivo)
+    - Control de capacidad y carga
+
+    Actúa como capa intermedia entre el repositorio y la lógica del sistema.
     """
 
-    def __init__(self, repository, recycler_service, point_service):
+    def __init__(self, repository):
         """
-        Inicializa el servicio con sus dependencias.
+        Inicializa el servicio con su repositorio.
 
         Args:
-            repository: Repositorio de registros.
-            recycler_service: Servicio de recicladores.
-            point_service: Servicio de puntos de recolección.
+            repository: Repositorio de puntos de recolección.
         """
         self._repository = repository
-        self._recycler_service = recycler_service
-        self._point_service = point_service
 
     def _validate_not_empty(self, value: str, field_name: str) -> None:
         """
-        Valida que un campo no esté vacío.
-        (Regla de validación DRY reutilizable en el sistema)
+        Valida que un campo obligatorio no esté vacío.
         """
         if not value or not str(value).strip():
             raise ValueError(f"El campo '{field_name}' no puede estar vacío.")
 
-    def _validate_record_id_unique(self, record_id: str) -> None:
+    def _validate_capacity(self, capacity_kg: float) -> None:
         """
-        Valida que el ID del registro no exista previamente.
+        Valida que la capacidad del punto sea mayor a 0.
         """
-        for record in self._repository.get_all():
-            if record.record_id == record_id:
-                raise ValueError(f"El ID de registro '{record_id}' ya existe.")
+        if float(capacity_kg) <= 0:
+            raise ValueError("La capacidad máxima debe ser un número positivo mayor a 0.")
 
-    def register_delivery(self, record_id: str, recycler_id: str, point_id: str,
-                          material_type: str, weight_kg: float, notes: str = "") -> RecyclingRecord:
+    def _validate_point_id_unique(self, point_id: str) -> None:
         """
-        Registra una entrega de material reciclable.
+        Verifica que el ID del punto no exista previamente.
+        """
+        for point in self._repository.get_all():
+            if point.point_id == point_id:
+                raise ValueError(
+                    f"El ID del punto de recolección '{point_id}' ya existe."
+                )
 
-        Incluye validaciones de:
+    def register_collection_point(self, point_id: str, name: str, location: str,
+                                  district: str, accepted_materials: list,
+                                  capacity_kg: float) -> CollectionPoint:
+        """
+        Registra un nuevo punto de recolección en el sistema.
+
+        Valida:
         - Campos obligatorios
-        - Tipos de material válidos
-        - Estado de reciclador y punto
-        - Capacidad del punto
-        """
-        self._validate_not_empty(record_id, "record_id")
-        self._validate_not_empty(recycler_id, "recycler_id")
-        self._validate_not_empty(point_id, "point_id")
-        self._validate_not_empty(material_type, "material_type")
-        self._validate_record_id_unique(record_id)
-
-        mat_clean = material_type.strip().lower()
-
-        if mat_clean not in VALID_MATERIALS:
-            raise ValueError(f"El tipo de material '{material_type}' no es válido en el sistema.")
-
-        if float(weight_kg) <= 0:
-            raise ValueError("El peso de la entrega debe ser un número mayor a cero.")
-
-        recycler = self._recycler_service.get_recycler_by_id(recycler_id.strip())
-        if not recycler.is_active:
-            raise ValueError("Operación denegada: El reciclador se encuentra inactivo.")
-
-        point = self._point_service.get_point_by_id(point_id.strip())
-        if not point.is_active:
-            raise ValueError("Operación denegada: El punto de recolección está inactivo.")
-
-        if mat_clean not in [m.lower() for m in point.accepted_materials]:
-            raise ValueError(f"Este punto de recolección no acepta el material: '{material_type}'.")
-
-        if point.current_load_kg + float(weight_kg) > point.capacity_kg:
-            raise ValueError("Transacción abortada: La entrega supera la capacidad máxima restante del punto.")
-
-        record = RecyclingRecord(
-            record_id=record_id.strip(),
-            recycler_id=recycler.recycler_id,
-            point_id=point.point_id,
-            material_type=mat_clean,
-            weight_kg=float(weight_kg),
-            record_date=datetime.now().isoformat(),
-            notes=notes.strip()
-        )
-
-        self._repository.add(record)
-        self._point_service.add_load(point_id.strip(), float(weight_kg))
-
-        return record
-
-    def get_all_records(self) -> list:
-        """Retorna todos los registros almacenados."""
-        return self._repository.get_all()
-
-    def get_records_by_recycler(self, recycler_id: str) -> list:
-        """Filtra registros por reciclador."""
-        self._recycler_service.get_recycler_by_id(recycler_id)
-        return [r for r in self._repository.get_all() if r.recycler_id == recycler_id]
-
-    def get_records_by_point(self, point_id: str) -> list:
-        """Filtra registros por punto de recolección."""
-        self._point_service.get_point_by_id(point_id)
-        return [r for r in self._repository.get_all() if r.point_id == point_id]
-
-    def get_top_recyclers(self) -> list:
-        """
-        Reporte: Top recicladores por kg total.
-
-        - Usa diccionario acumulador
-        - Convierte a lista de tuplas
-        - Ordena con sorted() y lambda por kg total
-        """
-        totals = {}
-        for record in self._repository.get_all():
-            if record.recycler_id not in totals:
-                totals[record.recycler_id] = [0.0, 0]
-            totals[record.recycler_id][0] += record.weight_kg
-            totals[record.recycler_id][1] += 1
-
-        tuples_list = []
-        for rec_id, metrics in totals.items():
-            try:
-                recycler = self._recycler_service.get_recycler_by_id(rec_id)
-                tuples_list.append((recycler.full_name, recycler.district, metrics[0], metrics[1]))
-            except ValueError:
-                continue
-
-        return sorted(tuples_list, key=lambda x: x[2], reverse=True)
-
-    def get_collection_points_status(self) -> list:
-        """Reporte de estado de puntos de recolección con nivel de ocupación."""
-        status_report = []
-        for point in self._point_service.list_active_points():
-            occupancy = self._point_service.calculate_occupancy_percentage(point)
-
-            if occupancy > 80.0:
-                alert = "Crítico"
-            elif occupancy > 60.0:
-                alert = "Atención"
-            else:
-                alert = "Normal"
-
-            status_report.append({
-                "name": point.name,
-                "current_load": point.current_load_kg,
-                "max_capacity": point.capacity_kg,
-                "percentage": round(occupancy, 2),
-                "status": alert
-            })
-
-        return status_report
-
-    def get_materials_breakdown(self) -> dict:
-        """
-        Reporte: total de kg por tipo de material.
-
-        (Uso de diccionario acumulador agrupado por categoría)
-        """
-        breakdown = {material: 0.0 for material in VALID_MATERIALS}
-
-        for record in self._repository.get_all():
-            if record.material_type in breakdown:
-                breakdown[record.material_type] += record.weight_kg
-
-        return breakdown
-
-    def get_records_by_date_range(self, start_date_str: str, end_date_str: str) -> dict:
-        """
-        Filtra registros por rango de fechas ISO 8601.
+        - Capacidad válida
+        - Materiales aceptados
+        - Unicidad del ID
 
         Retorna:
-            - lista de registros enriquecidos
-            - total de kg en el periodo
+            CollectionPoint: punto creado y almacenado.
         """
-        self._validate_not_empty(start_date_str, "start_date")
-        self._validate_not_empty(end_date_str, "end_date")
+        self._validate_not_empty(point_id, "point_id")
+        self._validate_not_empty(name, "name")
+        self._validate_not_empty(location, "location")
+        self._validate_not_empty(district, "district")
 
-        if start_date_str > end_date_str:
-            raise ValueError("La fecha de inicio no puede ser posterior a la fecha de fin.")
+        if not accepted_materials:
+            raise ValueError("Debe seleccionar al menos un material aceptado para este punto.")
 
-        filtered_list = []
-        total_period_kg = 0.0
+        self._validate_capacity(capacity_kg)
+        self._validate_point_id_unique(point_id)
 
-        for record in self._repository.get_all():
-            if start_date_str <= record.record_date <= end_date_str:
+        cleaned_materials = [
+            m.strip().lower()
+            for m in accepted_materials
+            if m.strip()
+        ]
 
-                try:
-                    recycler = self._recycler_service.get_recycler_by_id(record.recycler_id)
-                    recycler_name = recycler.full_name
-                except ValueError:
-                    recycler_name = "Desconocido"
+        point = CollectionPoint(
+            point_id=point_id.strip(),
+            name=name.strip(),
+            location=location.strip(),
+            district=district.strip(),
+            accepted_materials=cleaned_materials,
+            capacity_kg=float(capacity_kg),
+            current_load_kg=0.0,
+            is_active=True
+        )
 
-                try:
-                    point = self._point_service.get_point_by_id(record.point_id)
-                    point_name = point.name
-                except ValueError:
-                    point_name = "Desconocido"
+        self._repository.add(point)
+        return point
 
-                filtered_list.append({
-                    "recycler_name": recycler_name,
-                    "point_name": point_name,
-                    "material": record.material_type,
-                    "weight": record.weight_kg,
-                    "date": record.record_date
-                })
+    def get_all_points(self) -> list:
+        """Retorna todos los puntos de recolección registrados."""
+        return self._repository.get_all()
 
-                total_period_kg += record.weight_kg
+    def get_point_by_id(self, point_id: str) -> CollectionPoint:
+        """
+        Obtiene un punto de recolección por su ID.
 
-        return {
-            "records": filtered_list,
-            "total_period_kg": round(total_period_kg, 2)
-        }
+        Lanza error si no existe.
+        """
+        self._validate_not_empty(point_id, "point_id")
+
+        point = self._repository.get_by_id(point_id)
+
+        if not point:
+            raise ValueError(
+                f"Punto de recolección con ID '{point_id}' no encontrado."
+            )
+
+        return point
+
+    def list_active_points(self) -> list:
+        """Retorna solo los puntos de recolección activos."""
+        return [
+            p
+            for p in self._repository.get_all()
+            if p.is_active
+        ]
+
+    def calculate_occupancy_percentage(self, point: CollectionPoint) -> float:
+        """
+        Calcula el porcentaje de ocupación de un punto.
+
+        Returns:
+            float: porcentaje de ocupación (0-100)
+        """
+        if point.capacity_kg == 0:
+            return 0.0
+
+        return (point.current_load_kg / point.capacity_kg) * 100
+
+    def add_load(self, point_id: str, weight_kg: float) -> CollectionPoint:
+        """
+        Aumenta la carga actual de un punto de recolección.
+
+        Usado después de registrar una entrega exitosa.
+        """
+        point = self.get_point_by_id(point_id)
+        point.current_load_kg += float(weight_kg)
+        self._repository.update(point)
+        return point
+
+    def set_active_status(self, point_id: str, is_active: bool) -> CollectionPoint:
+        """
+        Activa o desactiva un punto de recolección.
+        """
+        point = self.get_point_by_id(point_id)
+        point.is_active = is_active
+        self._repository.update(point)
+        return point
