@@ -10,6 +10,7 @@ from src.ucr.ac.cr.controllers.recycler_controller import RecyclerController
 from src.ucr.ac.cr.controllers.collection_point_controller import CollectionPointController
 from src.ucr.ac.cr.controllers.record_controller import RecordController
 
+from src.ucr.ac.cr.views.main_app import MainApp
 
 def main():
     recycler_repo = RecyclerRepository("data/recyclers.json")
