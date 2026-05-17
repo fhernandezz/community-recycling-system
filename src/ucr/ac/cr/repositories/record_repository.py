@@ -3,7 +3,6 @@ from src.ucr.ac.cr.models.recycling_record import RecyclingRecord
 from src.ucr.ac.cr.repositories.base_repository import BaseRepository
 
 class RecordRepository(BaseRepository[RecyclingRecord]):
-
     def __init__(self, file_path="data/records.json"):
         self.file_path = file_path
         self._storage: list = self._load()
