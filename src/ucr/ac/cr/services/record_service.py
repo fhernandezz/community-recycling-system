@@ -33,11 +33,9 @@ class RecordService:
     def _validate_not_empty(self, value: str, field_name: str) -> None:
         """
         Valida que un campo obligatorio no esté vacío.
-
-        (Método auxiliar para evitar duplicación de código - DRY)
         """
         if not value or not str(value).strip():
-            raise ValueError(f"El campo '{field_name}' no puede estar vacío.")
+            raise ValueError(f"El campo {field_name} no puede estar vacío.")
 
     def _validate_record_id_unique(self, record_id: str) -> None:
         """
@@ -45,7 +43,7 @@ class RecordService:
         """
         for existing_record in self._repository.get_all():
             if existing_record.record_id == record_id:
-                raise ValueError(f"El ID de registro '{record_id}' ya existe.")
+                raise ValueError(f"El ID de registro {record_id} ya existe.")
 
     def register_delivery(self, record_id: str, recycler_id: str, point_id: str,
                           material_type: str, weight_kg: float, notes: str = "") -> RecyclingRecord:
