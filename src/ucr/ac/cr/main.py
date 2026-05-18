@@ -10,9 +10,12 @@ from src.ucr.ac.cr.controllers.recycler_controller import RecyclerController
 from src.ucr.ac.cr.controllers.collection_point_controller import CollectionPointController
 from src.ucr.ac.cr.controllers.record_controller import RecordController
 
+from src.ucr.ac.cr.views.login_view import LoginView
 from src.ucr.ac.cr.views.main_app import MainApp
 
+
 def main():
+    # Layer 1 — Repositories
     recycler_repo = RecyclerRepository()
     point_repo = CollectionPointRepository()
     record_repo = RecordRepository()
@@ -25,8 +28,14 @@ def main():
     point_controller = CollectionPointController(point_service)
     record_controller = RecordController(record_service)
 
-    app = MainApp(recycler_controller, point_controller, record_controller)
-    app.mainloop()
+    # abre la app principal después de un login exitoso
+    def open_main_app():
+        app = MainApp(recycler_controller, point_controller, record_controller)
+        app.mainloop()
+
+    # el login usa el mismo recycler_controller para validar credenciales
+    login = LoginView(recycler_controller, on_login_success=open_main_app)
+    login.mainloop()
 
 if __name__ == "__main__":
     main()
