@@ -4,7 +4,11 @@
         "name": "Punto Central",
         "location": "Avenida 1",
         "district": "Quepos",
-        "accepted_materials": ["plástico", "vidrio", "papel"],
+        "accepted_materials": [
+            "plástico",
+            "vidrio",
+            "papel"
+        ],
         "capacity_kg": 100.0,
         "current_load_kg": 75.0,
         "is_active": true
@@ -14,7 +18,10 @@
         "name": "Punto Norte",
         "location": "Calle 5",
         "district": "Parrita",
-        "accepted_materials": ["metal", "orgánico"],
+        "accepted_materials": [
+            "metal",
+            "orgánico"
+        ],
         "capacity_kg": 50.0,
         "current_load_kg": 35.0,
         "is_active": true
@@ -24,9 +31,13 @@
         "name": "Punto Sur",
         "location": "Avenida 3",
         "district": "Jacó",
-        "accepted_materials": ["plástico", "metal", "vidrio"],
+        "accepted_materials": [
+            "plástico",
+            "metal",
+            "vidrio"
+        ],
         "capacity_kg": 200.0,
-        "current_load_kg": 85.0,
+        "current_load_kg": 90.0,
         "is_active": true
     }
 ]
