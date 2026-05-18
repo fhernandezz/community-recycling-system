@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+
 class CollectionPointView(tk.Frame):
+
     def __init__(self, master, controller):
         super().__init__(master)
         self._controller = controller
@@ -50,17 +52,24 @@ class CollectionPointView(tk.Frame):
         tk.Label(self, text="Puntos de recolección registrados",
                  font=("Arial", 11, "bold")).pack(pady=(10, 2))
 
-        columns = ("id", "nombre", "ubicación", "distrito", "capacidad", "carga", "activo")
+        columns = ("id", "nombre", "ubicación", "distrito", "capacidad", "carga", "materiales", "activo")
         self._table = ttk.Treeview(self, columns=columns, show="headings", height=8)
 
         headers = {
-            "id": "ID", "nombre": "Nombre", "ubicación": "Ubicación",
-            "distrito": "Distrito", "capacidad": "Capacidad (kg)",
-            "carga": "Carga actual (kg)", "activo": "Activo"
+            "id": "ID",
+            "nombre": "Nombre",
+            "ubicación": "Ubicación",
+            "distrito": "Distrito",
+            "capacidad": "Capacidad (kg)",
+            "carga": "Carga actual (kg)",
+            "materiales": "Materiales aceptados",
+            "activo": "Activo"
         }
         for col_key, col_label in headers.items():
             self._table.heading(col_key, text=col_label)
             self._table.column(col_key, width=110)
+
+        self._table.column("materiales", width=200)
 
         self._table.pack(fill="both", expand=True, padx=10)
         tk.Button(self, text="Actualizar lista", command=self.load_points).pack(pady=5)
@@ -106,5 +115,6 @@ class CollectionPointView(tk.Frame):
                 point.district,
                 point.capacity_kg,
                 point.current_load_kg,
+                ", ".join(point.accepted_materials),
                 "Sí" if point.is_active else "No"
             ))
