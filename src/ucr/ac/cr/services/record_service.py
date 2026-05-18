@@ -72,7 +72,6 @@ class RecordService:
         if float(weight_kg) <= 0:
             raise ValueError("El peso de la entrega debe ser un número mayor a cero.")
 
-        # Validación cruzada entre servicios (principio de inversión de dependencias)
         found_recycler = self._recycler_service.get_recycler_by_id(recycler_id.strip())
         if not found_recycler.is_active:
             raise ValueError("Operación denegada: El reciclador se encuentra inactivo.")
@@ -81,7 +80,6 @@ class RecordService:
         if not found_point.is_active:
             raise ValueError("Operación denegada: El punto de recolección está inactivo.")
 
-        # Validación de materiales aceptados por el punto
         if clean_material not in [accepted.lower() for accepted in found_point.accepted_materials]:
             raise ValueError(f"Este punto de recolección no acepta el material: '{material_type}'.")
 
@@ -208,7 +206,10 @@ class RecordService:
 
     def get_records_by_date_range(self, start_date_str: str, end_date_str: str) -> dict:
         """
-        Filtra registros dentro de un rango de fechas ISO 8601.
+        Filtra registros dentro de un rango de fechas.
+
+        Acepta fechas en formato YYYY-MM-DD o YYYY-MM-DDTHH:MM:SS.
+        Si solo se ingresa la fecha, normaliza agregando hora automáticamente.
 
         Retorna:
         - Lista de registros enriquecidos
@@ -217,14 +218,17 @@ class RecordService:
         self._validate_not_empty(start_date_str, "start_date")
         self._validate_not_empty(end_date_str, "end_date")
 
-        if start_date_str > end_date_str:
+        start_normalized = start_date_str if "T" in start_date_str else start_date_str + "T00:00:00"
+        end_normalized = end_date_str if "T" in end_date_str else end_date_str + "T23:59:59"
+
+        if start_normalized > end_normalized:
             raise ValueError("La fecha de inicio no puede ser posterior a la fecha de fin.")
 
         filtered_records = []
         total_period_kg = 0.0
 
         for delivery_record in self._repository.get_all():
-            if start_date_str <= delivery_record.record_date <= end_date_str:
+            if start_normalized <= delivery_record.record_date <= end_normalized:
 
                 try:
                     found_recycler = self._recycler_service.get_recycler_by_id(delivery_record.recycler_id)
