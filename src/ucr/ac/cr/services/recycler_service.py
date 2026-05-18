@@ -74,3 +74,10 @@ class RecyclerService:
         recycler_to_update.is_active = is_active
         self._repository.update(recycler_to_update)
         return recycler_to_update
+
+    def validate_credentials(self, recycler_id: str, password: str) -> bool:
+        # el usuario ingresa su recycler_id y su cédula como contraseña
+        found_recycler = self._repository.get_by_id(recycler_id)
+        if not found_recycler:
+            return False
+        return found_recycler.id_number == password
