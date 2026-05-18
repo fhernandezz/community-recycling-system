@@ -14,6 +14,9 @@ class RecordController:
             notes=notes
         )
 
+    def get_all_records(self) -> list:
+        return self.service.get_all_records()
+
     def get_top_recyclers(self) -> list:
         return self.service.get_top_recyclers()
 
