@@ -25,3 +25,6 @@ class RecyclerController:
 
     def set_active_status(self, recycler_id: str, is_active: bool):
         return self.service.set_active_status(recycler_id, is_active)
+
+    def validate_credentials(self, recycler_id: str, password: str) -> bool:
+        return self.service.validate_credentials(recycler_id, password)
