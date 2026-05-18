@@ -1,0 +1,74 @@
+[
+    {
+        "record_id": "REC001",
+        "recycler_id": "R001",
+        "point_id": "P001",
+        "material_type": "plástico",
+        "weight_kg": 30.0,
+        "record_date": "2026-05-17T10:00:00",
+        "notes": ""
+    },
+    {
+        "record_id": "REC002",
+        "recycler_id": "R001",
+        "point_id": "P001",
+        "material_type": "vidrio",
+        "weight_kg": 25.0,
+        "record_date": "2026-05-17T10:30:00",
+        "notes": ""
+    },
+    {
+        "record_id": "REC003",
+        "recycler_id": "R002",
+        "point_id": "P002",
+        "material_type": "metal",
+        "weight_kg": 20.0,
+        "record_date": "2026-05-17T11:00:00",
+        "notes": ""
+    },
+    {
+        "record_id": "REC004",
+        "recycler_id": "R002",
+        "point_id": "P002",
+        "material_type": "orgánico",
+        "weight_kg": 15.0,
+        "record_date": "2026-05-17T11:30:00",
+        "notes": ""
+    },
+    {
+        "record_id": "REC005",
+        "recycler_id": "R003",
+        "point_id": "P003",
+        "material_type": "plástico",
+        "weight_kg": 40.0,
+        "record_date": "2026-05-17T12:00:00",
+        "notes": ""
+    },
+    {
+        "record_id": "REC006",
+        "recycler_id": "R003",
+        "point_id": "P003",
+        "material_type": "vidrio",
+        "weight_kg": 35.0,
+        "record_date": "2026-05-17T12:30:00",
+        "notes": ""
+    },
+    {
+        "record_id": "REC007",
+        "recycler_id": "R001",
+        "point_id": "P003",
+        "material_type": "metal",
+        "weight_kg": 10.0,
+        "record_date": "2026-05-17T13:00:00",
+        "notes": ""
+    },
+    {
+        "record_id": "REC008",
+        "recycler_id": "R002",
+        "point_id": "P001",
+        "material_type": "papel",
+        "weight_kg": 20.0,
+        "record_date": "2026-05-17T13:30:00",
+        "notes": ""
+    }
+]

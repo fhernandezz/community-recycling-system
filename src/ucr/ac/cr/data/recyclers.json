@@ -1,0 +1,32 @@
+[
+    {
+        "recycler_id": "R001",
+        "full_name": "Juan Pérez",
+        "id_number": "118240671",
+        "email": "juan@mail.com",
+        "phone": "88001122",
+        "district": "Quepos",
+        "registration_date": "2026-05-17T10:00:00",
+        "is_active": true
+    },
+    {
+        "recycler_id": "R002",
+        "full_name": "María Solís",
+        "id_number": "205340812",
+        "email": "maria@mail.com",
+        "phone": "87002233",
+        "district": "Parrita",
+        "registration_date": "2026-05-17T10:00:00",
+        "is_active": true
+    },
+    {
+        "recycler_id": "R003",
+        "full_name": "Carlos Mora",
+        "id_number": "312450923",
+        "email": "carlos@mail.com",
+        "phone": "86003344",
+        "district": "Jacó",
+        "registration_date": "2026-05-17T10:00:00",
+        "is_active": true
+    }
+]
