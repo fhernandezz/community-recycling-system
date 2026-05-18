@@ -6,7 +6,7 @@ class CollectionPoint:
         self.name = name
         self.location = location
         self.district = district
-        self.accepted_materials = accepted_materials  # list[str]
+        self.accepted_materials = accepted_materials
         self.capacity_kg = float(capacity_kg)
         self.current_load_kg = float(current_load_kg)
         self.is_active = is_active
